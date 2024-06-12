@@ -40,17 +40,11 @@ class WordTypeSerializer(ModelSerializer):
         fields = '__all__'
 
 
-# class SubgroupwordSerializer(ModelSerializer):
-#     class Meta:
-#         model = Subgroupword
-#         fields = '__all__'
-
 class SubgroupwordSerializer(ModelSerializer):
     options = SerializerMethodField()
 
     class Meta:
         model = Subgroupword
-        # fields = ['id', 'name', 'field_type', 'active', 'options']
         fields = [x.name for x in Subgroupword._meta.fields] + ['options']
 
     def get_options(self, obj):
@@ -62,17 +56,24 @@ class SubgroupwordSerializer(ModelSerializer):
         return None
 
 
-# class FormFieldSerializer(ModelSerializer):
-#     options = SerializerMethodField()
+class CustomSubgroupwordSerializer(ModelSerializer):
+    parent = PrimaryKeyRelatedField(read_only=True)
+    options = SerializerMethodField()
 
-#     class Meta:
-#         model = FormField
-#         fields = ['id', 'name', 'field_type', 'active', 'options']
+    class Meta:
+        model = Subgroupword
+        fields = '__all__'
 
-#     def get_options(self, obj):
-#         # Recuperar las opciones directamente asociadas al campo de formulario
-#         options = Subgroupword.objects.filter(field=obj, parent=None)
-#         # Serializar las opciones si existen
-#         if options:
-#             return SubgroupwordSerializer(options, many=True).data
-#         return None
+    def get_options(self, obj):
+        options = Subgroupword.objects.filter(parent=obj)
+        if options.exists():
+            return CustomSubgroupwordSerializer(options, many=True).data
+        return None
+
+
+class MeaningSubGroupWordSerializer(ModelSerializer):
+    sub_group_word = CustomSubgroupwordSerializer()
+
+    class Meta:
+        model = MeaningSubGroupWord
+        fields = ('meaning', 'sub_group_word')

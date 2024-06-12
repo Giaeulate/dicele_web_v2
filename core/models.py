@@ -172,65 +172,30 @@ class TranslationMeaning(AutoDateTimeAbstract):
         return f"{self.name}"
 
 
-# class GroupWord(AutoDateTimeAbstract):
-#     word_type = models.ForeignKey(
-#         WordType, on_delete=models.CASCADE, verbose_name='Tipo de palabra')
-#     name = models.CharField(max_length=100)
-
-#     class Meta:
-#         ordering = ('id',)
-#         verbose_name = 'Grupo'
-#         verbose_name_plural = 'Grupos'
-
-#     def __str__(self):
-#         return f"{self.name}"
-
-
-class FormField(AutoDateTimeAbstract):
-    FIELD_TYPE_CHOICES = [
-        ('text', 'Text'),
-        ('number', 'Number'),
-        ('date', 'Date'),
-        ('select', 'Select'),
-        ('checkbox', 'Checkbox'),
-    ]
-
-    name = models.CharField(max_length=100)
-    field_type = models.CharField(max_length=20, choices=FIELD_TYPE_CHOICES)
-
-    def __str__(self):
-        return self.name
-
-
 category_choices = [
     ('morph', 'Morfología'),
     ('sintx', 'Sintaxis'),
 ]
 
 FIELD_TYPE_CHOICES = [
-        ('text', 'Text'),
-        ('number', 'Number'),
-        ('date', 'Date'),
-        ('select', 'Select'),
-        ('checkbox', 'Checkbox'),
-    ]
+    ('text', 'Text'),
+    ('number', 'Number'),
+    ('date', 'Date'),
+    ('select', 'Select'),
+    ('checkbox', 'Checkbox'),
+]
+
 
 class Subgroupword(AutoDateTimeAbstract):
-    group = models.ForeignKey(WordType, on_delete=models.CASCADE, related_name='subgroups')
-    # type = models.ForeignKey(FormField, related_name='options', on_delete=models.CASCADE)
+    group = models.ForeignKey(
+        WordType, on_delete=models.CASCADE, related_name='subgroups')
     type = models.CharField(max_length=20, choices=FIELD_TYPE_CHOICES)
     name = models.CharField(max_length=100)
-    field_type = models.CharField(max_length=20, choices=FormField.FIELD_TYPE_CHOICES)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='options', on_delete=models.CASCADE)
+    field_type = models.CharField(max_length=20, choices=FIELD_TYPE_CHOICES)
+    parent = models.ForeignKey(
+        'self', null=True, blank=True, related_name='options', on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
     category = models.CharField(max_length=50, choices=category_choices)
-
-    # group = models.ForeignKey(WordType, on_delete=models.CASCADE, related_name='subgroups')
-    # parent_subgroup = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_subgroups')
-    # name = models.CharField(max_length=100)
-    # type = models.CharField(max_length=100, default='select')
-    # description = models.TextField(blank=True, null=True)
-    # category = models.CharField(max_length=50, choices=category_choices)
 
     class Meta:
         ordering = ('id',)
@@ -239,3 +204,16 @@ class Subgroupword(AutoDateTimeAbstract):
 
     def __str__(self):
         return f"{self.name}"
+
+
+class MeaningSubGroupWord(AutoDateTimeIdAbstract):
+    meaning = models.ForeignKey(Meaning, on_delete=models.CASCADE)
+    sub_group_word = models.ForeignKey(Subgroupword, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('id',)
+        verbose_name = 'Aception Sub Group'
+        verbose_name_plural = 'Aception Sub Groups'
+
+    def __str__(self):
+        return f"{self.id}"

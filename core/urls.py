@@ -35,4 +35,7 @@ urlpatterns = [
          name='sub_group_word-list-page'),
     path('sub_group_word/<slug:pk>/', SubgroupwordDetail.as_view(),
          name='sub_group_word-detail-page'),
+
+
+    path('meaning-detail/<int:pk>/', MeaningDetailView.as_view(), name='meaning-detail'),
 ]

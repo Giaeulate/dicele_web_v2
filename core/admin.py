@@ -58,3 +58,9 @@ class MeaningAdmin(admin.ModelAdmin):
 @admin.register(TranslationMeaning)
 class TranslationMeaningAdmin(admin.ModelAdmin):
     list_display = get_custom_admin_list(TranslationMeaning)
+
+
+@admin.register(MeaningSubGroupWord)
+class MeaningSubGroupWordAdmin(admin.ModelAdmin):
+    list_display = [x.name for x in MeaningSubGroupWord._meta.fields]
+    # search_fields = ['',]

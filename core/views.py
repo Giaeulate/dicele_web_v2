@@ -3,12 +3,10 @@
 # from django.shortcuts import render
 from rest_framework.generics import *
 from rest_framework.permissions import AllowAny
-# from rest_framework.response import Response
-# from rest_framework import status
-# from rest_framework import serializers
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from core.models import *
 from core.serializers import *
-from rest_framework.response import Response
 
 
 class LemaList(ListCreateAPIView):
@@ -81,14 +79,35 @@ class SubgroupwordList(ListCreateAPIView):
     queryset = Subgroupword.objects.filter(parent=None)
     serializer_class = SubgroupwordSerializer
 
-    # def get(self, request):
-    #     fields = Subgroupword.objects.filter(parent=None)
-    #     serializer = SubgroupwordSerializer(fields, many=True)
-    #     return Response(serializer.data)
-
 
 class SubgroupwordDetail(RetrieveUpdateDestroyAPIView):
     queryset = Subgroupword.objects.all()
     serializer_class = SubgroupwordSerializer
     permission_classes = [AllowAny]
 
+
+class MeaningDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            meaning = Meaning.objects.get(pk=pk)
+        except Meaning.DoesNotExist:
+            return Response({'error': 'Meaning not found'}, status=404)
+        try:
+            msgw = MeaningSubGroupWord.objects.filter(meaning=meaning).first()
+            subgroupword = msgw.sub_group_word
+        except MeaningSubGroupWord.DoesNotExist:
+            return Response({'error': 'Subgroupword not found for this Meaning'}, status=404)
+
+        subgroupword_data = SubgroupwordSerializer(subgroupword).data
+        parents_data = []
+        parent = subgroupword.parent
+        while parent is not None:
+            parent_data = SubgroupwordSerializer(parent).data
+            parents_data.append(parent_data)
+            parent = parent.parent
+
+        return Response({
+            'meaning': MeaningSerializer(meaning).data,
+            'sub_group_words': subgroupword_data,
+            'parents': parents_data
+        })
