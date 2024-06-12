@@ -58,9 +58,3 @@ class MeaningAdmin(admin.ModelAdmin):
 @admin.register(TranslationMeaning)
 class TranslationMeaningAdmin(admin.ModelAdmin):
     list_display = get_custom_admin_list(TranslationMeaning)
-
-
-@admin.register(FormField)
-class FormFieldAdmin(admin.ModelAdmin):
-    list_display = [x.name for x in FormField._meta.fields]
-    # search_fields = ['',]
