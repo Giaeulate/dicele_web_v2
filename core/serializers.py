@@ -1,34 +1,78 @@
-from rest_framework import serializers
-from .models import FormField, FormFieldOption
+''' serializers '''
+
+from rest_framework.serializers import *
+from .models import *
 
 
-class FormFieldOptionSerializer(serializers.ModelSerializer):
-    options = serializers.SerializerMethodField()
+class TypePronunciationSerializer(ModelSerializer):
+    class Meta:
+        model = TypePronunciation
+        fields = '__all__'
+
+
+class LemaSerializer(ModelSerializer):
+    class Meta:
+        model = Lema
+        fields = '__all__'
+
+
+class PronunciationSerializer(ModelSerializer):
+    class Meta:
+        model = Pronunciation
+        fields = '__all__'
+
+
+class OrthographySerializer(ModelSerializer):
+    class Meta:
+        model = Orthography
+        fields = '__all__'
+
+
+class MeaningSerializer(ModelSerializer):
+    class Meta:
+        model = Meaning
+        fields = '__all__'
+
+
+class WordTypeSerializer(ModelSerializer):
+    class Meta:
+        model = WordType
+        fields = '__all__'
+
+
+# class SubgroupwordSerializer(ModelSerializer):
+#     class Meta:
+#         model = Subgroupword
+#         fields = '__all__'
+
+
+class SubgroupwordSerializer(ModelSerializer):
+    options = SerializerMethodField()
 
     class Meta:
-        model = FormFieldOption
-        fields = ['id', 'label', 'field_type', 'required', 'options']
+        model = Subgroupword
+        fields = ['id', 'name', 'field_type', 'active', 'options']
 
     def get_options(self, obj):
         # Recuperar las subopciones del campo actual
-        suboptions = FormFieldOption.objects.filter(parent=obj)
+        suboptions = Subgroupword.objects.filter(parent=obj)
         # Serializar las subopciones si existen
         if suboptions:
-            return FormFieldOptionSerializer(suboptions, many=True).data
+            return SubgroupwordSerializer(suboptions, many=True).data
         return None
 
 
-class FormFieldSerializer(serializers.ModelSerializer):
-    options = serializers.SerializerMethodField()
+class FormFieldSerializer(ModelSerializer):
+    options = SerializerMethodField()
 
     class Meta:
         model = FormField
-        fields = ['id', 'label', 'field_type', 'required', 'options']
+        fields = ['id', 'name', 'field_type', 'active', 'options']
 
     def get_options(self, obj):
         # Recuperar las opciones directamente asociadas al campo de formulario
-        options = FormFieldOption.objects.filter(field=obj, parent=None)
+        options = Subgroupword.objects.filter(field=obj, parent=None)
         # Serializar las opciones si existen
         if options:
-            return FormFieldOptionSerializer(options, many=True).data
+            return SubgroupwordSerializer(options, many=True).data
         return None
