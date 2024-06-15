@@ -173,8 +173,12 @@ class TranslationMeaning(AutoDateTimeAbstract):
 
 
 category_choices = [
-    ('morph', 'Morfología'),
-    ('sintx', 'Sintaxis'),
+    ('clasificacion', 'clasificacion'),
+    ('morfologia', 'morfologia'),
+    ('sintaxis', 'sintaxis'),
+    ('pragmatica', 'pragmatica'),
+    ('cultura', 'cultura'),
+    ('ejemplos', 'ejemplos'),
 ]
 
 FIELD_TYPE_CHOICES = [
@@ -183,6 +187,7 @@ FIELD_TYPE_CHOICES = [
     ('date', 'Date'),
     ('select', 'Select'),
     ('checkbox', 'Checkbox'),
+    ('custom_textarea', 'Custom Textarea'),
 ]
 
 
@@ -195,7 +200,8 @@ class Subgroupword(AutoDateTimeAbstract):
     parent = models.ForeignKey(
         'self', null=True, blank=True, related_name='options', on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
-    category = models.CharField(max_length=50, choices=category_choices)
+    category = models.CharField(max_length=50, choices=category_choices, default=category_choices[0])
+    add_traduction = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('id',)
@@ -209,6 +215,7 @@ class Subgroupword(AutoDateTimeAbstract):
 class MeaningSubGroupWord(AutoDateTimeIdAbstract):
     meaning = models.ForeignKey(Meaning, on_delete=models.CASCADE)
     sub_group_word = models.ForeignKey(Subgroupword, on_delete=models.CASCADE)
+    value = models.CharField(max_length=255, default='')
 
     class Meta:
         ordering = ('id',)
